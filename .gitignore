@@ -1,0 +1,5 @@
+# Run configuration for GUI
+uci.bat
+
+# Pycache
+__pycache__
