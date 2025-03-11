@@ -1,2 +1,2 @@
-# C64o3
-A chess engine written in python. Where's o1 and o2? Who knows.
+# C64v3
+A chess engine written in python. Where's v1 and v2? Who knows.
