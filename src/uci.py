@@ -1,6 +1,6 @@
 import chess
 import sys
-from random import choice
+from C64v3 import lookup
 
 
 class UCIEngine:
@@ -11,7 +11,7 @@ class UCIEngine:
         self.options = {
             "depth": {
                 "type": "spin",
-                "value": 2,     # Default value
+                "value": 4,     # Default value
                 "min": 1,
                 "max": 100
             }
@@ -82,7 +82,7 @@ class UCIEngine:
     def handle_go(self):
         # Returning a random move as a placeholder
         if self.board.legal_moves.count() > 0:
-            self.send(f"bestmove {choice(tuple(self.board.legal_moves))}")
+            self.send(f"bestmove {lookup(self.board, self.options["depth"]["value"])}")
         
         else:
             self.send("bestmove (none)")
