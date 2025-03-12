@@ -11,7 +11,7 @@ class UCIEngine:
         self.options = {
             "depth": {
                 "type": "spin",
-                "value": 1,     # Default value
+                "value": 2,     # Default value
                 "min": 1,
                 "max": 100
             }
