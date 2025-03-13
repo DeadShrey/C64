@@ -11,15 +11,95 @@ piece_values = {
     chess.KING: 0
 }
 
+psqts = {
+    chess.PAWN: [
+         0,   0,   0,   0,   0,   0,   0,   0,
+        50,  50,  50,  50,  50,  50,  50,  50,
+        10,  10,  20,  30,  30,  20,  10,  10,
+         5,   5,  10,  25,  25,  10,   5,   5,
+         0,   0,   0,  20,  20,   0,   0,   0,
+         5,  -5, -10,   0,   0, -10,  -5,   5,
+         5,  10,  10, -20, -20,  10,  10,   5,
+         0,   0,   0,   0,   0,   0,   0,   0
+    ],
+    chess.KNIGHT: [
+        -50, -40, -30, -30, -30, -30, -40, -50,
+        -40, -20,   0,   5,   5,   0, -20, -40,
+        -30,   5,  10,  15,  15,  10,   5, -30,
+        -30,   0,  15,  20,  20,  15,   0, -30,
+        -30,   5,  15,  20,  20,  15,   5, -30,
+        -30,   0,  10,  15,  15,  10,   0, -30,
+        -40, -20,   0,   0,   0,   0, -20, -40,
+        -50, -20, -30, -30, -30, -30, -20, -50
+    ],
+    chess.BISHOP: [
+        -20, -10, -10, -10, -10, -10, -10, -20,
+        -10,   5,   0,   0,   0,   0,   5, -10,
+        -10,  10,  10,  10,  10,  10,  10, -10,
+        -10,   0,  10,  10,  10,  10,   0, -10,
+        -10,   5,   5,  10,  10,   5,   5, -10,
+        -10,   0,   5,  10,  10,   5,   0, -10,
+        -10,   0,   0,   0,   0,   0,   0, -10,
+        -20, -10, -10, -10, -10, -10, -10, -20
+    ],
+    chess.ROOK: [
+         0,   0,   0,   5,   5,   0,   0,   0,
+        -5,   0,   0,   0,   0,   0,   0,  -5,
+        -5,   0,   0,   0,   0,   0,   0,  -5,
+        -5,   0,   0,   0,   0,   0,   0,  -5,
+        -5,   0,   0,   0,   0,   0,   0,  -5,
+        -5,   0,   0,   0,   0,   0,   0,  -5,
+         5,  10,  10,  10,  10,  10,  10,   5,
+         0,   0,   0,   0,   0,   0,   0,   0
+    ],
+    chess.QUEEN: [
+        -20, -10, -10,  -5,  -5, -10, -10, -20,
+        -10,   0,   0,   0,   0,   0,   0, -10,
+        -10,   0,   5,   5,   5,   5,   0, -10,
+         -5,   0,   5,   5,   5,   5,   0,  -5,
+          0,   0,   5,   5,   5,   5,   0,  -5,
+        -10,   5,   5,   5,   5,   5,   0, -10,
+        -10,   0,   5,   0,   0,   0,   0, -10,
+        -20, -10, -10,  -5,  -5, -10, -10, -20
+    ],
+    chess.KING: [
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -20, -30, -30, -40, -40, -30, -30, -20,
+        -10, -20, -20, -20, -20, -20, -20, -10,
+         20,  20,   0,   0,   0,   0,  20,  20,
+         20,  30,  10,   0,   0,  10,  30,  20
+    ]
+}
+
 
 def evaluate(board: chess.Board):
     evaluation = 0
 
-    for piece_type in range(1, 6):
-        white_pieces = board.pieces_mask(piece_type, chess.WHITE).bit_count()
-        black_pieces = board.pieces_mask(piece_type, chess.BLACK).bit_count()
+    white_material = 0
+    white_psqt_score = 0
+    black_material = 0
+    black_psqt_score = 0
+
+    for sq in range(64):
+        piece = board.piece_at(sq)
+        if piece is None: continue
+
+        # Conting material value and applying psqts
+        psqt = psqts[piece.piece_type]
+
+        if piece.color == chess.WHITE:
+            white_material += piece_values[piece.piece_type]
+            white_psqt_score += psqt[chess.square_mirror(sq)]
         
-        evaluation += (white_pieces - black_pieces) * piece_values[piece_type]
+        else:
+            black_material += piece_values[piece.piece_type]
+            black_psqt_score += psqt[sq]
+
+    evaluation += white_material - black_material
+    evaluation += white_psqt_score - black_psqt_score
     
     perspective = (1 if board.turn == chess.WHITE else -1)
     return evaluation * perspective
