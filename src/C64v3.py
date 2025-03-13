@@ -151,8 +151,7 @@ def search(board: chess.Board, depth: int, alpha: int, beta: int):
         alpha = max(alpha, evaluation)
         if alpha >= beta:
             if not board.is_capture(move):  # The move is not a capture and can be used as a killer move
-                moves = killer_moves[depth - 1]
-                moves = [moves[1], move]
+                killer_moves[depth - 1] = [killer_moves[depth - 1][1], move]
 
             return alpha  # *Snip*
 
