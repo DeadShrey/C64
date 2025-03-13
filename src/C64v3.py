@@ -131,6 +131,40 @@ def order_moves(move: chess.Move, board: chess.Board, depth: int):
     return guess_score
 
 
+def order_captures(move: chess.Move, board: chess.Board):
+    moved_piece = board.piece_type_at(move.from_square)
+    captured_piece = board.piece_type_at(move.to_square)
+    
+    if captured_piece is not None:
+        return 10 * piece_values[captured_piece] - piece_values[moved_piece]  # MVV-LVA
+
+    return 10 - piece_values[moved_piece]  # En passant
+
+
+def quiescence_search(board: chess.Board, alpha: int, beta: int):
+    if board.outcome() is not None:
+        if board.is_checkmate():
+            return -inf
+        
+        return 0
+    
+    stand_pat = evaluate(board)
+    if stand_pat >= beta: return stand_pat
+    alpha = max(alpha, stand_pat)
+
+    ordered_captures = sorted(board.generate_legal_captures(), key=lambda move: order_captures(move, board), reverse=True)
+
+    for move in ordered_captures:
+        board.push(move)
+        evaluation = -quiescence_search(board, -beta, -alpha)
+        board.pop()
+
+        if evaluation >= beta: return beta
+        alpha = max(alpha, evaluation)
+
+    return alpha
+
+
 def search(board: chess.Board, depth: int, alpha: int, beta: int):
     if board.outcome() is not None:
         if board.is_checkmate():
@@ -139,7 +173,7 @@ def search(board: chess.Board, depth: int, alpha: int, beta: int):
         return 0
     
     if depth == 0:
-        return evaluate(board)
+        return quiescence_search(board, alpha, beta)
     
     ordered_moves = sorted(board.legal_moves, key=lambda move: order_moves(move, board, depth), reverse=True)
 
@@ -148,12 +182,13 @@ def search(board: chess.Board, depth: int, alpha: int, beta: int):
         evaluation = -search(board, depth - 1, -beta, -alpha)
         board.pop()
 
-        alpha = max(alpha, evaluation)
-        if alpha >= beta:
+        if evaluation >= beta:
             if not board.is_capture(move):  # The move is not a capture and can be used as a killer move
                 killer_moves[depth - 1] = [killer_moves[depth - 1][1], move]
 
-            return alpha  # *Snip*
+            return beta  # *Snip*
+        
+        alpha = max(alpha, evaluation)
 
     return alpha
 
