@@ -3,11 +3,11 @@ import chess
 
 inf = float("inf")
 piece_values = {
-    chess.PAWN: 1,
-    chess.KNIGHT: 3,
-    chess.BISHOP: 3,
-    chess.ROOK: 5,
-    chess.QUEEN: 9,
+    chess.PAWN: 100,
+    chess.KNIGHT: 300,
+    chess.BISHOP: 325,
+    chess.ROOK: 500,
+    chess.QUEEN: 900,
     chess.KING: 0
 }
 
@@ -80,11 +80,7 @@ def lookup(board: chess.Board, depth: int):
         evaluation = -search(board, depth - 1, -inf, inf)
         board.pop()
 
-        if best_eval < evaluation:
-            best_eval = evaluation
-            best_move = move
-        
-        elif best_eval == -inf and evaluation == -inf: # The situation is helpless :(
+        if best_eval <= evaluation:
             best_eval = evaluation
             best_move = move
     
