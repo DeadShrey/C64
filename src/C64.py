@@ -1,4 +1,5 @@
 import chess
+from random import choice
 
 
 inf = float("inf")
@@ -194,7 +195,7 @@ def search(board: chess.Board, depth: int, alpha: int, beta: int):
 
 
 def lookup(board: chess.Board, depth: int):
-    best_move = None
+    best_move = []
     best_eval = -inf
 
     for move in board.legal_moves:
@@ -202,8 +203,11 @@ def lookup(board: chess.Board, depth: int):
         evaluation = -search(board, depth - 1, -inf, inf)
         board.pop()
 
-        if best_eval <= evaluation:
+        if best_eval < evaluation:
             best_eval = evaluation
-            best_move = move
+            best_move = [move]
+        
+        elif best_eval == evaluation:
+            best_move.append(move)
     
-    return best_move
+    return choice(best_move)
