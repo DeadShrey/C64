@@ -1,6 +1,6 @@
 import chess
 import sys
-from C64v3 import lookup
+from C64 import lookup
 
 
 class UCIEngine:
