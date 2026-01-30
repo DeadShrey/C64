@@ -1,2 +1,2 @@
-# C64
+# P64
 A simple chess engine written in python!
